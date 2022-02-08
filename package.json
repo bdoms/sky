@@ -1,11 +1,11 @@
 {
   "name": "sky",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A markdown static site generator.",
   "homepage": "",
   "repository": {
     "type": "git",
-    "url": "git@github.com:skywrite/sky.git"
+    "url": "git@github.com:bdoms/sky.git"
   },
   "keywords": [
     "blog",
@@ -20,7 +20,8 @@
     "static",
     "sky"
   ],
-  "author": "JP Richardson <jprichardson@gmail.com>",
+  "authors": ["JP Richardson <jprichardson@gmail.com>",
+    "Brendan Doms <b@bdoms.com>"],
   "licenses": [
     {
       "type": "MIT",
@@ -28,43 +29,43 @@
     }
   ],
   "dependencies": {
-    "open": "0.0.2",
-    "rock": "~0.3.0",
     "autoresolve": "0.0.3",
-    "markdown-page": "~0.2.1",
-    "commander": "~1.1.1",
-    "ejs": "~0.8.3",
-    "walker": "~1.0.3",
-    "buffet": "~0.6.0",
-    "parentpath": "~0.2.0",
-    "death": "0.0.1",
-    "markdown-walker": "~0.1.0",
-    "date-tokens": "0.0.2",
-    "fs-extra": "~0.6.0",
-    "jsoncfg": "~0.1.2",
     "batchflow": "~0.4.0",
-    "colors": "~0.6.0-1",
-    "nextflow": "~0.3.0",
+    "brucedown": "^1.1.1",
+    "buffet": "~1.0.11",
     "cl": "0.0.1",
-    "string": "~1.5.0",
-    "rss": "0.0.4",
-    "scrap": "~0.1.0",
-    "underscore": "~1.4.4",
-    "sorto": "0.0.2",
-    "consolidate": "~0.9.1",
-    "jade": "~0.30.0",
+    "colors": "~1.4.0",
+    "commander": "~9.0.0",
+    "consolidate": "~0.16.0",
+    "date-tokens": "0.0.2",
+    "death": "1.1.0",
+    "ejs": "~3.1.6",
+    "fs-extra": "~10.0.0",
+    "jade": "^0.29.0",
+    "jsoncfg": "~0.1.2",
     "markdown-extra": "~0.1.0",
-    "brucedown": "0.0.1",
-    "ymd": "0.0.1",
-    "win-spawn": "~1.1.2",
+    "markdown-page": "~0.2.1",
+    "markdown-walker": "~0.1.0",
+    "nextflow": "~0.3.0",
+    "open": "8.4.0",
+    "parentpath": "~0.2.0",
+    "rock": "^0.2.0",
+    "rss": "1.2.2",
+    "scrap": "~0.1.0",
+    "shelljs": "~0.8.5",
     "sky-env": "0.5.x",
-    "shelljs": "~0.1.4"
+    "sorto": "0.0.2",
+    "string": "~3.3.3",
+    "underscore": "~1.13.2",
+    "walker": "~1.0.8",
+    "win-spawn": "~1.1.2",
+    "ymd": "1.0.0"
   },
   "devDependencies": {
     "mocha": "*",
     "scrap": "~0.1.0",
-    "testutil": "~0.6.0",
-    "stripcolorcodes": "~0.1.0"
+    "stripcolorcodes": "~0.1.0",
+    "testutil": "^0.5.1"
   },
   "main": "./lib/sky.js",
   "scripts": {
