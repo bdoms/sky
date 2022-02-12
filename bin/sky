@@ -1,56 +1,106 @@
 #!/usr/bin/env node
 
-var program = require('commander')
-  , spawn = require('win-spawn')
-  , fs = require('fs-extra')
-  , path = require('path')
-  , ON_DEATH = require('death')
-
-program
-  .version(require('../package').version)
-  .usage('<command> [options]')
+const fs = require('fs'),
+  path = require('path');
+  showdown = require('showdown'),
+  yargs = require('yargs');
 
 
-program.on('--help', function(){
-  console.log('  Commands:');
-  console.log();
-  console.log('    article <title> [--tags]      install one or more components')
-  console.log();
-  process.exit();
-})
+yargs.reset()
+  .usage('Usage: sky [options] input output')
+  .example('sky foo.md bar.html', 'Reads \'foo.md\' and writes to \'bar.html\'')
+  .example('sky foo/ bar/', 'Reads from \'foo\' directory and writes to \'bar\' directory')
+  .example('sky foo/ bar.html', 'Reads from \'foo\' directory and writes all files to \'bar.html\'')
+  .version()
+  .alias('v', 'version')
+  .config('c')
+  .alias('c', 'config')
+  .help('h')
+  .alias('h', 'help')
+  .positional('input', {
+    describe: 'Path to input',
+    type: 'string'
+  })
+  .positional('output', {
+    describe: 'Path to output',
+    type: 'string'
+  })
+  .option('e', {
+    alias : 'encoding',
+    describe: 'Input encoding',
+    type: 'string'
+  });
 
-program.parse(process.argv)
+
+var readFile = function(path) {
+  try {
+    return fs.readFileSync(path, encoding);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 
-var args = process.argv.slice(3)
-  , cmd = program.args[0];
+var writeFile = function(path, html) {
+  try {
+    fs.writeFileSync(html, path);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 
-if (!cmd) {
-  process.stdout.write(program.helpInformation())
-  program.emit('--help')
-  process.exit()
+var run = function() {
+  'use strict';
+  var argv = yargs.argv,
+    converter = new showdown.Converter(),
+    enc = argv.encoding || 'utf8',
+    input = argv.input,
+    output = argv.output,
+    pages = {},
+    key, html, md, out_path;
+
+  if (fs.lstatSync(input).isDirectory()) {
+    fs.readdirSync(input).forEach(function(in_path) {
+      if (fs.lstatSync(in_path).isFile()) {
+        console.log('Reading from ' + in_path + '...');
+        md = readFile(in_path, enc);
+
+        console.log('Parsing markdown...');
+        html = converter.makeHtml(md);
+
+        key = path.basename(in_path, '.md');
+        pages[key] = html;
+      }
+    });
+  }
+  else {
+    console.log('Reading from ' + input + '...');
+    md = readFile(input, enc);
+
+    console.log('Parsing markdown...');
+    pages[input] = converter.makeHtml(md);
+  }
+
+  if (fs.lstatSync(output).isDirectory()) {
+    for (key in pages) {
+      out_path = path.join(output, key + '.html');
+      console.log('Writing to ' + out_path + '...');
+      writeFile(out_path, pages[key]);
+    }
+  }
+  else {
+    // combine html into one string for outputting to one file
+    html = '';
+    for (key in pages) {
+      html += pages[key];
+    }
+
+    console.log('Writing to ' + output + '...');
+    writeFile(output, html);
+  }
 }
 
-// aliases
-
-switch (cmd) {
-  case 'a': cmd = 'article'; break;
-  case 'b': cmd = 'build'; break;
-  case 't': cmd = 'tag'; break;
-}
-
-var bin = path.join(__dirname, 'sky-' + cmd)
-
-if (!fs.existsSync(bin)) {
-  console.error("Can't locate command %s at path %s Did it get deleted?", 'sky-' + cmd, bin)
-  process.exit(1)
-}
-
-var proc = spawn(bin, args, { stdio: 'inherit', customFds: [0, 1, 2] })
-proc.on('exit', process.exit) //hook up exit code to shell output
-
-ON_DEATH(function() {
-  proc.removeAllListeners('exit')
-  proc.kill()
-})
+module.exports = exports = {
+  run: run
+};
