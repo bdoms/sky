@@ -29,6 +29,11 @@ yargs.reset()
     alias : 'encoding',
     describe: 'Input encoding',
     type: 'string'
+  })
+  .option('t', {
+    alias : 'template',
+    describe: 'Path to HTML template file',
+    type: 'string'
   });
 
 
@@ -58,11 +63,16 @@ var run = function() {
     input = argv.input,
     output = argv.output,
     pages = {},
-    key, html, md, out_path;
+    template_path = argv.template,
+    key, html, md, out_path, template;
+
+  if (template_path) {
+    template = readFile(template_path, enc);
+  }
 
   if (fs.lstatSync(input).isDirectory()) {
     fs.readdirSync(input).forEach(function(in_path) {
-      if (fs.lstatSync(in_path).isFile()) {
+      if (fs.lstatSync(in_path).isFile() && path.extname(in_path) === '.md') {
         console.log('Reading from ' + in_path + '...');
         md = readFile(in_path, enc);
 
@@ -86,17 +96,29 @@ var run = function() {
     for (key in pages) {
       out_path = path.join(output, key + '.html');
       console.log('Writing to ' + out_path + '...');
-      writeFile(out_path, pages[key]);
+
+      html = pages[key];
+
+      if (template) {
+        html = template.replace('{content}', html);
+      }
+
+      writeFile(out_path, html);
     }
   }
   else {
+    console.log('Writing to ' + output + '...');
+
     // combine html into one string for outputting to one file
     html = '';
     for (key in pages) {
       html += pages[key];
     }
 
-    console.log('Writing to ' + output + '...');
+    if (template) {
+      html = template.replace('{content}', html);
+    }
+
     writeFile(output, html);
   }
 }
